@@ -1,0 +1,1 @@
+ # Gọi các hàm từ file1.py
