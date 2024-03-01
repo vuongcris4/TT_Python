@@ -1,1 +1,1 @@
- # Gọi các hàm từ file1.py
+dict(word=item[0], meaning=item[1])
