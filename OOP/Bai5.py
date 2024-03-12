@@ -32,6 +32,13 @@ if __name__ == "__main__":
     book_shelf = [sach1, sach2]
     book_shelf.append(sach3)
     book_shelf.append(sach4)
+    # n = 3
+    # book_shelf = []
+    # for i in range(1, n+1):
+    #     print("Book " + str(i))
+    #     book_shelf.append(
+    #         Book(input("Title: "), input("Author: "), float(input("Price: ")))
+    #     )
 
     # Sách có giá thấp nhất, hàm trả về object Book, dùng method View để xem
     print("\nSách có giá thấp nhất")
