@@ -11,6 +11,7 @@ class DANH_SACH(QMainWindow):
         super().__init__()
         uic.loadUi("dsSinhVien.ui", self)
         # self.show()
+        self.tbSinhVien.itemSelectionChanged.connect(self.get_item_by_select)
 
     def load_table_student(self):
         try:
@@ -27,9 +28,21 @@ class DANH_SACH(QMainWindow):
             print("Error when load database: ", e)
         finally:
             mydb.disconnect()
-        
-        mydb.disconnect()
-        
+
+        # mydb.disconnect()
+
+    def get_item_by_select(self):
+        select_row = self.tbSinhVien.currentRow()
+        if select_row != -1:
+            self.id_selected = self.tbSinhVien.item(select_row, 0).text()
+        return self.id_selected
+
+    def delete_by_id(self):
+        mydb.connect()
+        # print(self.id_selected)
+        mydb.delete_by_id(self.id_selected)
+        self.load_table_student()
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 

@@ -8,7 +8,7 @@ from database import *
 
 mydb = MY_DB()
 
-
+ 
 class UI:
     def __init__(self):
         self.main = MAIN()
@@ -25,6 +25,7 @@ class UI:
 
         self.dsSinhVien = DANH_SACH()
         self.dsSinhVien.btnOK.clicked.connect(lambda: self.changeUI("main"))
+        self.dsSinhVien.btnRemove.clicked.connect(lambda: self.dsSinhVien.delete_by_id())
 
     def changeUI(self, i):
         if i == "show_diem":  # khi bấm nút btnCalculate

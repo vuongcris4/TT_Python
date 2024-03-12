@@ -29,7 +29,7 @@ class MAIN(QMainWindow):
         Anh = float(self.edtAnh.text())
         mydb.connect()
         mydb.insert_row(ID, Ten, Toan, Li, Anh)
-        mydb.disconnect()
+        # mydb.disconnect()
 
 
 if __name__ == "__main__":
