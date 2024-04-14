@@ -20,10 +20,13 @@ class MAIN(QMainWindow):
         GPA = float(self.edtGPA.text())
         student = STUDENT(ID, Name, GPA)
         self.lop_hoc.DS.append(student)
+        self.load_table_student()
 
     def load_table_student(self):
         self.tbStudent.setRowCount(0)
-        for student in self.lop_hoc()
+        for student in self.lop_hoc.DS:
+            student.View()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
