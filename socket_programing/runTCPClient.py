@@ -58,7 +58,12 @@ class Connect_ReceiveMessage(QThread):
             if connected == True:  # Kết nối thành công thì nhận gói tin
                 try:
                     received_msg = client.recv(HEADER).decode(FORMAT)  # GÓI TIN CẦN TÌM
+                    # item = QListWidgetItem(
+                    #     str(received_msg)
+                    # )  # Add từng item kiểu này để scroll xuống được
                     self.ui.message.lstMessage.addItem(received_msg)
+                    sleep(0.1)  # Add xong cần một tí thời gian mới scrollDown được
+                    self.ui.message.lstMessage.scrollToBottom()
                     # print(received_msg)
 
                     if received_msg == "":  # Nếu trả về gói tin rỗng thì server bị tắt
@@ -103,15 +108,16 @@ class UI:
         # send_thread.send_signal.connect(self.handle_send_result)
         # send_thread.start()
         # print(msg)
-        item = QListWidgetItem(
-            "\t" * 3 + msg
-        )  # Add từng item kiểu này để scroll xuống được
-        self.message.lstMessage.addItem(item)  # align right
-        self.message.lstMessage.scrollToItem(item)
-
-        self.message.txtMessage.setText("")
+        if connected and msg != "":
+            item = QListWidgetItem(
+                "\t" * 4 + "[Tôi]: " + msg
+            )  # Add từng item kiểu này để scroll xuống được
+            self.message.lstMessage.addItem(item)  # align right
+            self.message.lstMessage.scrollToItem(item)
+            self.message.txtMessage.setText("")
         try:
-            send(f"[{NAME}]: {msg}")  # SEND NAME (nhập từ bàn phím), msg
+            if msg != "":
+                send(f"[{NAME}]: {msg}")  # SEND NAME (nhập từ bàn phím), msg
         except Exception as e:
             alert = QMessageBox()
             alert.setIcon(QMessageBox.Icon.Warning)

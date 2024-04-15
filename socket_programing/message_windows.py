@@ -10,6 +10,7 @@ class MESSAGE(QMainWindow):
         uic.loadUi("message_windows.ui", self)
 
         self.txtMessage.setFocus()
+        
 
         # self.show()
 
