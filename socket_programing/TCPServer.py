@@ -13,23 +13,31 @@ clients = {} # {conn: "Name client"}
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
+def send_client_quit(conn):
+    msg_disconnected = f'[SERVER]: Client "{clients[conn]}" is quitted' # Tên client vừa thoát
+    print(msg_disconnected)
+    del clients[conn]
+
+    for each_conn in clients.keys():                  # Thông báo tới các client còn lại client này đã quit
+        each_conn.send(msg_disconnected.encode(FORMAT))
+
 
 def handle_client(conn, addr):
     # print(f"[NEW CONNECTION] {addr} connected.")
     try:
         while True:
-            msg = conn.recv(HEADER).decode(FORMAT)
-            print(msg)
+            try:
+                msg = conn.recv(HEADER).decode(FORMAT)   
+                print(msg)
+            except ConnectionResetError:
+                send_client_quit(conn)
+                break
+
 
             # Khi terminate cmd phía client hoặc gõ !exit
-            if not msg or DISCONNECT_MESSAGE in msg:                                        
-                msg_disconnected = f'[SERVER]: Client "{clients[conn]}" is quitted' # Tên client vừa thoát
-                print(msg_disconnected)
-                del clients[conn]
-
-                for each_conn in clients.keys():                  # Thông báo tới các client còn lại client này đã quit
-                    each_conn.send(msg_disconnected.encode(FORMAT))
-                break
+            if not msg or DISCONNECT_MESSAGE in msg:       
+                send_client_quit(conn)
+                break                                 
             
             for each_conn in clients.keys():
                 if each_conn != conn:
@@ -59,8 +67,13 @@ def start():
         msg_connect = f'[SERVER]: Client "{clients[conn]}" is joined'
         print(msg_connect)
         for each_conn in clients.keys():    
-            if conn != each_conn:            
-                each_conn.send(msg_connect.encode(FORMAT))
+            if conn != each_conn: 
+                try:           
+                    each_conn.send(msg_connect.encode(FORMAT))
+                except OSError:
+                    msg_disconnected = f'[SERVER]: Client "{clients[conn]}" is quitted' # Tên client vừa thoát
+                    print(msg_disconnected)
+                    break
 
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
