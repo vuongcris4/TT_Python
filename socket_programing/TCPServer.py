@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 
-HEADER = 64
+HEADER = 1024
 PORT = 8000
 SERVER = ""
 ADDR = (SERVER, PORT)
@@ -22,6 +22,17 @@ def send_client_quit(conn):
         each_conn.send(msg_disconnected.encode(FORMAT))
 
 
+def recieve_file(conn, file_size, msg):
+    file_name = msg[msg.rfind("/")+1:-1] # Lấy tên file
+    print(file_name)
+    with open("FILE_RECEIVE/"+file_name, 'wb') as file:
+        recieved_size = 0
+        while recieved_size < file_size:
+            data = conn.recv(1024)
+            recieved_size += len(data)
+            file.write(data)
+    print("File received successfully")
+
 def handle_client(conn, addr):
     # print(f"[NEW CONNECTION] {addr} connected.")
     try:
@@ -29,6 +40,12 @@ def handle_client(conn, addr):
             try:
                 msg = conn.recv(HEADER).decode(FORMAT)   
                 print(msg)
+                if "SEND_FILE: " in msg:
+                    # thread = threading.Thread(target=recieve_file, args=(conn, msg))
+                    # thread.start()
+                    file_size = int(conn.recv(HEADER).decode(FORMAT))
+                    recieve_file(conn, file_size, msg)
+
             except ConnectionResetError:
                 send_client_quit(conn)
                 break
@@ -46,6 +63,8 @@ def handle_client(conn, addr):
                     except OSError as e:
                         print(f"[ERROR] Client Socket was closed {each_conn}: {e}") # Đề phòng lỗi
                         del clients[conn]
+
+            
 
     except ConnectionAbortedError: # Socket lỗi tự đóng
         print(f"[CONNECTION LOST] {addr} disconnected unexpectedly")
