@@ -5,10 +5,11 @@ from logging_windows import LOGGING
 from message_windows import MESSAGE
 
 import socket
+import os
 from time import sleep
 
 
-HEADER = 64
+HEADER = 1024
 PORT = 8000
 FORMAT = "UTF-8"
 DISCONNECT_MESSAGE = "!exit"
@@ -115,10 +116,17 @@ class UI:
             self.message.lstMessage.addItem(item)  # align right
             self.message.lstMessage.scrollToItem(item)
             self.message.txtMessage.setText("")
+
         try:
             if msg != "":
-                send(f"[{NAME}]: {msg}")  # SEND NAME (nhập từ bàn phím), msg
+                if "SEND_FILE: " not in msg:
+                    send_msg(f"[{NAME}]: {msg}")  # SEND NAME (nhập từ bàn phím), msg
+                else:
+                    send_msg(f"[{NAME}]: {msg}")  # Gửi đường dẫn file
+                    send_file(msg)
+
         except Exception as e:
+            print(e)
             alert = QMessageBox()
             alert.setIcon(QMessageBox.Icon.Warning)
             alert.setWindowTitle("Thông báo")
@@ -126,9 +134,27 @@ class UI:
             alert.exec()
 
 
-def send(msg):
+def send_file(file_path):
+    file_path = file_path[
+        len("SEND_FILE: ") + 1 : -1
+    ]  # Lấy đường dẫn file (bỏ dấu ngoặc kép)
+    size_file = str(os.path.getsize(file_path))
+    send_msg(size_file + (" " * (HEADER - len(size_file))))  # Gửi kích thước file
+
+    print(file_path)
+    with open(file_path, "rb") as file:  # binary mode
+        while True:
+            data = file.read(1024)
+            if not data:
+                print(data)
+                break  # End of file
+            client.sendall(data)
+        print("send done")
+
+
+def send_msg(msg):
     message = msg.encode(FORMAT)
-    message += b" " * (HEADER - len(message))  # Thêm dấu cách cho đủ 64 byte
+    # message += b" " * (HEADER - len(message))  # Thêm dấu cách cho đủ 64 byte
     client.send(message)
 
 

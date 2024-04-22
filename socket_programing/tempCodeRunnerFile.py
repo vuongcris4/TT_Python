@@ -1,0 +1,1 @@
+self.message.txtMessage.text()
